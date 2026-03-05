@@ -35,36 +35,49 @@ int main() {
         return -2;
     }
    
-    uint32_t highest_index = 0;
+    uint32_t device_count = 0;
     for (const pcap_if_t * current_device = all_devices; nullptr != current_device; current_device = current_device->next) {
         if (PCAP_IF_LOOPBACK == (current_device->flags & PCAP_IF_LOOPBACK) || PCAP_IF_RUNNING != (current_device->flags & PCAP_IF_RUNNING)) {
-            highest_index++;
             continue;
         }
 
-        std::cout << std::format("{:d}) {:s}", highest_index++, current_device->description) << std::endl;
+        device_count++;
     }
-
-    int parsed_input_index = -1;
-    std::string input;
-
-    do {
-        std::cout << "Pick a device by index: ";
-        std::getline(std::cin, input);
-
-        try {
-            const uint32_t potential_parsed_input_index = std::stoul(input);
-            if (highest_index > potential_parsed_input_index) {
-                parsed_input_index = potential_parsed_input_index;
+    
+    const pcap_if_t * selected_device;
+    if (1 < device_count) {
+        uint32_t print_index = 0;
+        for (const pcap_if_t * current_device = all_devices; nullptr != current_device; current_device = current_device->next) {
+            if (PCAP_IF_LOOPBACK == (current_device->flags & PCAP_IF_LOOPBACK) || PCAP_IF_RUNNING != (current_device->flags & PCAP_IF_RUNNING)) {
+                continue;
             }
-        }
-        catch (std::invalid_argument) {}
-    }
-    while (-1 == parsed_input_index);
 
-    const pcap_if_t * selected_device = all_devices;
-    for (int i = 0; i < parsed_input_index && nullptr != selected_device; i++) {
-        selected_device = selected_device->next;
+            std::cout << std::format("{:d}) {:s}", print_index++, current_device->description) << std::endl;
+        }
+
+        int parsed_input_index = -1;
+        std::string input;
+
+        do {
+            std::cout << "Pick a device by index: ";
+            std::getline(std::cin, input);
+
+            try {
+                const uint32_t potential_parsed_input_index = std::stoul(input);
+                if (device_count > potential_parsed_input_index) {
+                    parsed_input_index = potential_parsed_input_index;
+                }
+            }
+            catch (std::invalid_argument) {}
+        } while (-1 == parsed_input_index);
+
+        selected_device = all_devices;
+        for (int i = 0; i < parsed_input_index && nullptr != selected_device; i++) {
+            selected_device = selected_device->next;
+        }
+    }
+    else {
+        selected_device = all_devices;
     }
 
     if (nullptr == selected_device) {
