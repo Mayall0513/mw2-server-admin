@@ -286,7 +286,7 @@ void packet_handler([[maybe_unused]] u_char * user, [[maybe_unused]] const struc
             if (true == std::regex_search(oob_type, partystate_regex)) {
                 handle_playerstate_packet(packet_parser);
             }
-            else if (true == std::regex_search(oob_type, vt_regex)) {
+            else if (oob_type.starts_with("vt")) {
                 // we only want to consider incoming vt packets
                 if (false == is_outgoing) {
                     handle_vt_packet(ip_header, packet_parser);

@@ -34,7 +34,6 @@ struct player_data_t {
 };
 
 std::regex partystate_regex("^\\d+partystate$");
-std::regex vt_regex("^vt$");
 
 bool get_external_packed_ip_address(uint32_t& packed_internal_ip_address);
 
