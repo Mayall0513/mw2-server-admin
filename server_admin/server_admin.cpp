@@ -69,7 +69,8 @@ int main() {
                 }
             }
             catch (std::invalid_argument) {}
-        } while (-1 == parsed_input_index);
+        }
+        while (-1 == parsed_input_index);
 
         selected_device = all_devices;
         for (int i = 0; i < parsed_input_index && nullptr != selected_device; i++) {
@@ -131,7 +132,7 @@ int main() {
     system("cls");
     std::cout << "Waiting for data...";
 
-    std::thread player_status_thread(update_player_statuses);
+    const std::thread player_status_thread(update_player_statuses);
     const int loop_result = pcap_loop(device_handle, 0, packet_handler, nullptr);
     player_thread_continue.store(false);
 
@@ -245,14 +246,14 @@ bool get_external_packed_ip_address(uint32_t & packed_internal_ip_address) {
 void update_player_statuses() {
     while (true == player_thread_continue.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::lock_guard<std::mutex> read_lock(party_players_mutex);
+        const std::lock_guard<std::mutex> read_lock(party_players_mutex);
         if (0 == party.m_max_player_count) {
             continue;
         }
 
         const uint64_t timestamp = epoch_timestamp_milliseconds();
         const uint64_t latest_last_seen = timestamp - PLAYER_TIMEOUT_MILLISECONDS;
-        bool     any_removed = false;
+        bool any_removed = false;
 
         for (size_t i = 0; i < MAX_PLAYER_COUNT; i++) {
             player_wrapper_t & player_wrapper = players[i];
@@ -347,7 +348,7 @@ void handle_vt_packet(const ipv4_header_t * ip_header, packet_parser & packet_pa
 }
 
 void handle_playerstate_packet(packet_parser & packet_parser) {
-    std::lock_guard<std::mutex> scope_lock(party_players_mutex);
+    const std::lock_guard<std::mutex> scope_lock(party_players_mutex);
 
     const uint64_t received_timestamp = epoch_timestamp_milliseconds();
     const uint32_t update_tick = packet_parser.read_bytes<uint32_t>(4);

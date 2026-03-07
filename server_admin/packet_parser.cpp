@@ -11,7 +11,7 @@ packet_parser::packet_parser(const uint8_t * buffer, size_t size) {
 }
 
 std::string packet_parser::read_string() {
-	std::string output(this->m_char_buffer + this->m_byte_cursor);
+	const std::string output(this->m_char_buffer + this->m_byte_cursor);
 	this->m_byte_cursor += output.size() + 1;
 	return output;
 }

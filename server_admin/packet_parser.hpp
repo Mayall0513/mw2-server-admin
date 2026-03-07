@@ -5,8 +5,6 @@
 #include <string>
 #include <stdexcept>
 
-#include <format>
-
 template<typename T>
 concept plain_data = std::is_trivially_copyable_v<T> && std::is_standard_layout_v<T>;
 
